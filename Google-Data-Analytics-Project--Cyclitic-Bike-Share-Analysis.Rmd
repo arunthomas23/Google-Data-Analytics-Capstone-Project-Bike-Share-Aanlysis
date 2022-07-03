@@ -1,0 +1,543 @@
+
+sink("./output.txt", append = T)
+---
+title: "Google Data Analytics Project- Cyclistic Bike Share Analyis"
+author: "Arun Thomas"
+date: '2022-06-25'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+
+## R Markdown
+
+
+## Introduction
+
+This analysis is for case study  from Google Data Analytics Professional Certificate.It entails analysing historical data for a hypothetical company called Cyclistic, a Chicago-based bike sharing company, in order to make marketing campaign recommendations. Although the firm and situation are made up, the data for this project was taken from a Chicago bike share programme between January 2021 and December 2021 inclusive, the data could be found here https://divvy-tripdata.s3.amazonaws.com/index.html In this scenario I’m playing the part of a junior analyst having the task to evaluate: “How do annual members and casual riders use Cyclistic bikes differently?
+
+
+
+
+### Scenario
+
+
+You are a junior data analyst working in the marketing analyst team at Cyclistic, a bike-share company in Chicago. The director
+of marketing believes the company’s future success depends on maximizing the number of annual memberships. Therefore,
+your team wants to understand how casual riders and annual members use Cyclistic bikes differently. From these insights,
+your team will design a new marketing strategy to convert casual riders into annual members. But first, Cyclistic executives
+must approve your recommendations, so they must be backed up with compelling data insights and professional data
+visualizations.
+
+## 1.Ask
+
+### Business Objective
+
+Through a targeted marketing approach, to increase revenue by converting casual riders into annual members.
+
+### Business Task
+
+The junior analyst has been tasked with answering the following question:
+“How do annual members and casual riders use Cyclistic bikes differently?”
+
+### Stakeholders Involved
+
+The stakeholders involved in this project are: Director of Marketing at Cyclistic : Lily Moreno, responsible for the marketing campaigns at Cyclistic.
+
+The Cyclistic marketing team, responsible with collecting and analysing and reporting data.
+
+The Cyclistic management team. This group makes the ultimate decision on the marketing strategy that has been recommended. They are known for their meticulous attention to detail
+
+
+### Location of Data
+
+The data used in this project can be found here:
+https://divvy-tripdata.s3.amazonaws.com/index.html
+This data has been collected by Motivate company employed by the city of Chicago to collect data about the usage of their bikes.
+
+### Data Organisation
+
+The data is stored in csv files that are updated on a monthly basis. For this research, the most current twelve months of data (January 2021 – December 2021) were used. The files have 13 columns that contain information such as ride id, ridership type, trip time, start and end locations, and geographic coordinates, among other things.
+
+### Credibility of the Data
+
+Motivate, Inc., the corporation that manages the City of Chicago’s Cyclistic Bike Share programme, collects the data directly.
+The data is extensive and includes information from all of the rides recorded on the system, rather than just a sample. The information is current.
+It is published on a monthly basis and was current as of December 2021. The data is made accessible to the public by the City of Chicago.
+
+### Licensing, Privacy, Security and Accesibility
+
+All identifying information has been removed from this data, making it anonymous. This protects privacy, but also restricts the scope of the investigation. There is insufficient data to tell whether casual riders are repeat riders or if casual riders are Chicago residents. This licence https://ride.divvybikes.com/data-license-agreement governs the distribution of this data.
+
+### Data’s ability to provide answers to this Business Question
+
+The type of rider is recorded in one of the fields in the dataset; casual riders pay for individual or daily rides, whereas member riders pay for an annual subscription. This data is necessary in order to identify differences in how the two groups use the bike share programme.
+
+## 3. Process and Clean
+### What tools I choosed and Why
+I used RStudio Desktop to analyse, clean, perform summarisations and visualisations the data for this project was too large for RStudio Cloud.
+Considering how versatile RStudio is I considered being the best tool for this project.
+### Integrity of Dataset
+
+Data was examined to gain a general understanding of field content, data formats, and data integrity.
+Checking column names throughout the 12 original files and looking for missing values, trailing white spaces, duplicate records, and other data abnormalities were all part of the data assessment.
+
+#### This review identified the following abnormalities:
+
+Missing values in the start and end stations variables
+Missing values in the end_lat, end_lgt, start_lat and start_lgt
+Duplicate records in ride_ID variable
+Too long or too short values in the ride duration variable
+
+
+
+
+
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+### Load the necessary libraries
+
+
+```{r cars}
+library(tidyverse)
+library(dplyr)
+library(skimr)
+library(lubridate)
+library(scales)
+library(ggplot2)
+library(janitor)
+```
+
+### uploading all the files
+```
+apr20 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202004-divvy-tripdata.csv")
+
+may20 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202005-divvy-tripdata.csv")
+
+jun20 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202006-divvy-tripdata.csv")
+
+jul20 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202007-divvy-tripdata.csv")
+
+aug20 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202008-divvy-tripdata.csv")
+
+sep20 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202009-divvy-tripdata.csv")
+
+oct20 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202010-divvy-tripdata.csv")
+
+nov20 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202011-divvy-tripdata.csv")
+
+dec20 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202012-divvy-tripdata.csv")
+
+jan21 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202101-divvy-tripdata.csv")
+
+feb21 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202102-divvy-tripdata.csv")
+
+mar21 <- read.csv("C:\\Users\\arunt\\Desktop\\Project\\project 1\\Google data analytics\\Data\\202103-divvy-tripdata.csv")
+
+```
+
+### Combnining 12 months  data into one frame
+```
+combined_df <- rbind(apr20,may20,jun20,jul20,aug20,sep20,
+                     nov20,dec20,jan21,feb21,mar21)
+  
+  ```
+### inorder to understand the data type
+
+```{r}
+glimpse(combined_df)
+```
+
+
+### rermoving empty colums and rows
+
+```
+combined_dfs = combined_df %>%
+  remove_empty(which = c("cols","rows")) %>%
+  clean_names()
+  
+  ```
+
+### converting the variable from character to numeric values
+```{r}
+combined_df1 = combined_dfs %>%
+  mutate(
+    start_lat = as.numeric(start_lat),
+    start_lng = as.numeric(start_lng),
+    end_lat = as.numeric(end_lat),
+    end_lng = as.numeric(end_lng)
+  )
+
+```
+
+
+
+  
+
+### for viewinng data
+```{r}
+glimpse(combined_df1)
+```
+
+
+
+## #finding out missing data
+```{r}
+colSums(is.na(combined_df1))
+```
+
+```{r}
+combined_df1 %>%
+  summary()
+```
+
+
+
+### Formating dat-time columns
+
+combined_df2 = combined_df1 %>%
+  mutate(
+    started_at = ymd_hms(as_datetime(started_at)),
+    ended_at = ymd_hms(as_datetime(ended_at))
+  )
+
+glimpse(combined_df2)
+
+### creating additonal column based on started at date time column
+
+combined_df3 =combined_df2 %>%
+  mutate(
+    hour_start = hour(started_at),
+    weekday = wday(started_at,label = T,abbr = F),
+    month = month(started_at, label = T, abbr =F),
+    day = day(started_at),
+    week = strftime(started_at, format = "%V"),
+    trip_time = difftime(ended_at, started_at, units = "mins")
+  )
+  
+```{r}
+glimpse(combined_df3)
+```
+  
+    
+  
+  
+  
+  
+
+### Formaating rideable_type
+  
+  combined_df4 = combined_df3 %>% 
+    mutate(
+     rideable_type = recode(as.factor(rideable_type),
+                             "classic_bike" = "classic",
+                             "electric_bike"= "electric",
+                             "docked_bike" = "docked"),
+      member_casual = as_factor(member_casual)
+    )
+
+
+
+
+#### Renaming rideable type into bikes and member_causal into users
+  combined_df4 =combined_df4 %>%
+    rename(
+      bikes = rideable_type,
+      users = member_casual
+    )
+
+glimpse(combined_df4)
+
+
+combined_df5 = combined_df4 %>%
+  filter(
+    between(trip_time,1,1440)#(trip time could not be samller than 1 min or longer than 24 h = 1440min)
+   )
+
+summarise(combined_df5)
+
+### internal struture of the data
+
+str(combined_df5)
+
+### statistical evaluation of resulated data frame
+
+```{r}
+combined_df5 %>%
+  skim_without_charts()
+
+```
+
+
+
+
+
+
+### creating new data frame with time difference variables for analysis
+```{r}
+combined_time_df =combined_df5 %>%
+  drop_na(
+    end_lat,end_lng
+  )%>%
+  select(ride_id,users,bikes,hour_start,weekday,month,day,week,trip_time)
+
+```
+
+
+colSums(is.na(combined_time_df))
+
+### creating data frame based on location for analysis
+
+```{r}
+combined_location_df = combined_df5%>% 
+  select(
+    ride_id, start_station_name, end_station_name, start_lat, start_lng,
+    end_lat, end_lng, users, trip_time
+  ) %>% 
+  drop_na(
+    start_station_name, end_station_name,end_lat,end_lng
+  )
+```
+
+
+
+
+colSums(is.na(combined_location_df))
+                     
+                     
+
+
+## Data Visualisation 
+
+###Time Analysis under difffernt conditons
+
+### Day Hour Analysis
+
+```{r}
+ride_hours = 
+  combined_time_df %>% 
+  group_by(
+    users, hour_start
+  ) %>% 
+  summarise(
+    nr_rides = n(),
+    average_trip = mean(trip_time),
+    total_trip = sum(trip_time)
+  )
+```
+
+### number of trip per hour
+
+
+
+```{r}
+ride_hours %>% 
+  ggplot(aes(hour_start, nr_rides, fill = users))+ 
+  geom_col(position = "dodge")+ 
+  scale_y_continuous()+
+  labs(
+    title = "Number of Trips per Hour",
+    subtitle = "Number of trips for every hour and by users",
+    caption = "Figure 1",
+    x = "hour of the day",
+    y = "number of rides",
+  )+
+  theme()
+```
+        
+### average number of trip by hour
+
+
+```{r}
+ride_hours %>% 
+  ggplot(aes(hour_start, average_trip, fill = users))+ 
+  geom_col(position = "dodge")+ 
+  scale_y_continuous()+
+  labs(
+    title = "Average Number of Trips per Hour",
+    subtitle = "Number of trips for every hour segmented by users",
+    caption = "Figure 2",
+    x = "hour of the day",
+    y = "average trips duration",
+  )+
+  theme()
+```
+
+### total trip duration per hour
+
+```{r}
+ride_hours %>% 
+  ggplot(aes(hour_start, total_trip, fill = users))+ 
+  geom_col(show.legend = TRUE, position = "dodge")+ 
+  scale_y_continuous()+
+  labs(
+    title = "Total trip Duration per Hour",
+    subtitle = "Total duration for every hour segmented by users",
+    caption = "Figure 3",
+    x = "hour of the day",
+    y = "total duration",
+  )+
+  theme()
+```
+
+
+## Analaysis of days of the week
+
+
+
+ride_week = combined_time_df %>% 
+  group_by(
+    users, weekday
+  ) %>% 
+  summarise(
+    nr_rides_week = n(),
+    avg_rides_week = mean(trip_time),
+    total_duration_week = sum(trip_time)
+  )
+
+### number of trips by weekdays 
+
+```{r}
+ride_week %>% 
+  ggplot(aes(weekday, nr_rides_week, fill = users))+
+    geom_col(position = "dodge")+
+    scale_y_continuous(labels = comma)+
+    labs(
+      title = "Trips Time by Week Days and Segmented by Users",
+      subtitle = "Number of trips for every week of the year",
+      caption = "Fig 4",
+      x = "day of the week",
+      y = "number of trips"
+    )+
+    theme()
+```
+
+### average trips time by day of week
+
+```{r}
+ride_week %>% 
+  ggplot(aes(weekday, avg_rides_week, fill = users))+
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = comma)+
+  labs(
+    title = "Average Trips Time by Week Days and Segmented by Users",
+    subtitle = "Average Number of trips for every week of the year",
+    caption = "Fig 5",
+    x = "day of the week",
+    y = " avg number of trips"
+  )+
+  theme()
+
+```
+
+### total trips time by day of week
+
+```{r}
+ride_week %>% 
+  ggplot(aes(weekday, total_duration_week, fill = users))+
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = comma)+
+  labs(
+    title = "Total Time Trips by Week Days and Segmented by Users",
+    subtitle = "Total Trips Time for every week of the year",
+    caption = "Fig 6",
+    x = "day of the week",
+    y = " total time trips"
+  )+
+  theme()
+```
+### Analyis of trip by month
+
+
+
+ride_month = combined_time_df %>% 
+  group_by(
+    users, month
+  ) %>% 
+  summarise(
+    nr_rides_month = n(),
+    avg_rides_month = mean(trip_time),
+    total_time_month = sum(trip_time)
+  )
+
+### numbers of trips by month
+  
+  
+```{r}
+ride_month %>% 
+  ggplot(aes(month, nr_rides_month, fill = users))+
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = comma)+
+  labs(
+    title = "Number of Trips by Month and Segmented by Users",
+    subtitle = "Number Trips Time for every Month",
+    caption = "Fig 7",
+    x = "month",
+    y = " number of trips"
+  )+
+  theme()
+```
+ ### average trips by month      
+ 
+ 
+```{r}
+ride_month %>% 
+  ggplot(aes(month, avg_rides_month, fill = users))+
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = comma)+
+  labs(
+    title = "Average Trips Time by Month and Segmented by Users",
+    subtitle = "Average Trips Time for every Month",
+    caption = "Fig 8",
+    x = "month",
+    y = "average trips time"
+  )+
+  theme()
+```
+   
+   ### total trips time by month
+
+```{r}
+ride_month %>% 
+  ggplot(aes(month, total_time_month, fill = users))+
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = comma)+
+  labs(
+    title = "Total Trips Time by Month and Segmented by Users",
+    subtitle = "Total Trips Time for every Month",
+    caption = "Fig 8",
+    x = "month",
+    y = "total trips time"
+  )+
+  theme()
+```
+   
+##Conculsions
+
+###Casual Riders
+From June to August, Casual riders had more rides than membership riders, with Annual riders having more rides from January to May and September to December.           
+             
+### Average duration            
+             
+ The average duration for yearly riders appears to be pretty consistent throughout the year, whereas the average time for casual rides is longer than for membership riders.            
+### Total duration            
+             
+Casual riders’ total duration is higher from March to October, while membership riders’ total length is higher from January to February and November to December             
+             
+
+    
+sink()
+
+             
+             
+             
+
+
+             
+
